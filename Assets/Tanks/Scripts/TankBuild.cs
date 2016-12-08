@@ -13,7 +13,7 @@ public class TankBuild : NetworkBehaviour
 
     public TankSettings m_settings;
     
-    private Transform m_gunPosition;
+    private Transform m_cabinPosition;
     private TankControl m_tankControl;
 
     void Awake()
@@ -26,7 +26,7 @@ public class TankBuild : NetworkBehaviour
         if (isLocalPlayer)
         {
             int myBodyId = m_settings.m_selectedBodyIndex;
-            int myGunId = m_settings.m_selectedGunIndex;
+            int myGunId = m_settings.m_selectedCabin;
             CmdUpdate(myBodyId, myGunId);
         }
         else if (!isServer && m_readyToBuild)
@@ -55,7 +55,7 @@ public class TankBuild : NetworkBehaviour
     public void Build(int bodyId, int gunId)
     {
         BuildBody(bodyId);
-        BuildGun(gunId);
+        BuildCabin(gunId);
     }
 
     private void BuildBody(int id)
@@ -67,6 +67,7 @@ public class TankBuild : NetworkBehaviour
             transform);
 
         TankBody bodyProperties = body.GetComponent<TankBody>();
+        this.GetComponent<Rigidbody>().mass = bodyProperties.mass;
 
         BoxCollider bodyColider = body.GetComponent<BoxCollider>();
         BoxCollider tankColider = gameObject.AddComponent<BoxCollider>();
@@ -82,26 +83,31 @@ public class TankBuild : NetworkBehaviour
         m_tankControl.m_moveSpeed = bodyProperties.moveSpeed;
         m_tankControl.m_rotateSpeed = bodyProperties.rotateSpeed;
 
-        m_gunPosition = body.transform.FindChild("GunPosition");
-        if (m_gunPosition == null)
-            throw new MissingComponentException("No GunPosition child found on Tank Body");
+        m_cabinPosition = body.transform.FindChild("CabinPosition");
+        if (m_cabinPosition == null)
+            throw new MissingComponentException("No CabinPosition child found on Tank Body");
     }
 
     
-    private void BuildGun(int id)
+    private void BuildCabin(int id)
     {
-        GameObject gun = (GameObject)Instantiate(m_settings.m_tankGuns[id], m_gunPosition.position, transform.rotation, transform);
+        GameObject cabin = (GameObject)Instantiate(m_settings.m_tankCabins[id], m_cabinPosition.position, transform.rotation, transform);
 
-        m_tankControl.m_gun = gun.transform;
+        Transform gun = cabin.transform.FindChild("Gun");
 
-        Transform bulletSpawn = gun.transform.FindChild("BulletSpawn");
+        if (gun == null)
+            throw new MissingComponentException("No Gun child found on Tank Cabin");
+
+        m_tankControl.m_gun = gun;
+
+        Transform bulletSpawn = gun.FindChild("BulletSpawn");
 
         if (bulletSpawn == null)
             throw new MissingComponentException("No BulletSpawn child found on Tank Gun");
 
         m_tankControl.m_bulletSpawn = bulletSpawn;
 
-        TankGun gunProperties = gun.GetComponent<TankGun>();
+        TankGun gunProperties = cabin.GetComponent<TankGun>();
 
         if (gunProperties == null)
             throw new MissingComponentException("Gun Prefab must have TankGun script component");

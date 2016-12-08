@@ -26,7 +26,7 @@ public class PracticeManager : MonoBehaviour {
 
         m_tank = (GameObject)Instantiate(m_tankPrefab, spawnPosition.position, spawnPosition.rotation);
         m_tank.GetComponent<TankControl>().m_isPractice = true;
-        m_tank.GetComponent<TankBuild>().Build(m_tankSettings.m_selectedBodyIndex, m_tankSettings.m_selectedGunIndex);
+        m_tank.GetComponent<TankBuild>().Build(m_tankSettings.m_selectedBodyIndex, m_tankSettings.m_selectedCabin);
 	}
 	
 	public void EndPractice () {

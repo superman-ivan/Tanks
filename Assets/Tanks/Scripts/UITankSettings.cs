@@ -27,7 +27,7 @@ public class UITankSettings : MonoBehaviour {
         m_tank = (GameObject)Instantiate(m_tankPrefab, m_preveiw.transform);
         m_tank.transform.localPosition = Vector3.zero;
         m_tank.transform.localRotation = Quaternion.identity;
-        m_tank.GetComponent<TankBuild>().Build(m_settings.m_selectedBodyIndex, m_settings.m_selectedGunIndex);
+        m_tank.GetComponent<TankBuild>().Build(m_settings.m_selectedBodyIndex, m_settings.m_selectedCabin);
     }
 
     void OnDisable()
@@ -44,7 +44,7 @@ public class UITankSettings : MonoBehaviour {
 
     public void ShiftGun(bool forward)
     {
-        m_settings.ShiftGun(forward);
+        m_settings.ShiftCabin(forward);
         RebuildTank();
     }
 
